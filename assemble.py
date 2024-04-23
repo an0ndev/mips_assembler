@@ -24,6 +24,7 @@ class Imm(Field):
         elif text.startswith("0b") or text.startswith("2_"):
             text = text[2:]
             text = text.replace("_", "").replace(" ", "")
+            assert len(text) <= 16, f"bitstring literal {text} too long for 16-bit field"
             val = 0
             power = 0
             for bit in reversed(text):
