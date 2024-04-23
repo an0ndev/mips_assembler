@@ -18,6 +18,8 @@ class Imm(Field):
     def parse(text: str) -> MachineCodeFields:
         if text.startswith("0x"):
             text = text[2:]
+            if len(text) % 2 == 1:
+                text = text.zfill(len(text) + 1)
             val = int.from_bytes(bytes.fromhex(text), byteorder="big")
         elif text.startswith("0b") or text.startswith("2_"):
             text = text[2:]
@@ -34,6 +36,10 @@ class Imm(Field):
                 val = int(text)
             except ValueError:
                 assert False, f"Invalid immediate {text}"
+            if val < 0:
+                assert val >= -(2 ** 15), f"immediate of {val} cannot fit in the field"
+                as_bytes = val.to_bytes(length=2, byteorder="big", signed=True)
+                val = int.from_bytes(as_bytes, byteorder="big", signed=False)
         return {"imm": val}
 
 
@@ -153,7 +159,10 @@ class IType(Instruction):
     def encode(cls, rs: int = 0, rt: int = 0, imm: int = 0) -> bytes:
         instr = cls._base_val(rs=rs, rt=rt)
         top_bytes = (instr >> 16).to_bytes(length=2, byteorder="big")
-        imm_bytes = imm.to_bytes(length=2, byteorder="big")
+
+        assert imm <= 2 ** 16 - 1, f"immediate of {imm} cannot fit in the field"
+
+        imm_bytes = imm.to_bytes(length=2, byteorder="big", signed=False)
 
         return top_bytes + imm_bytes
 
