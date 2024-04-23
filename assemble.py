@@ -362,7 +362,7 @@ def machine_code_to_vhdl(machine_code: list[tuple[bytes, Optional[str]]]) -> str
     text = ""
 
     for instr, src_line in machine_code:
-        instr_hex = instr.hex()
+        instr_hex = instr.hex().upper()
 
         text += "    " * 2
 
