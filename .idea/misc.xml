@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Black">
+    <option name="sdkName" value="Python 3.12 (mips_assembler)" />
+  </component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="13df7497-bc5e-4959-945b-68de2ad125b2" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (mips_assembler)" project-jdk-type="Python SDK" />
+</project>
