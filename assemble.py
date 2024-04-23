@@ -239,7 +239,7 @@ class Add(RType):
 class Sub(RType):
     name = "sub"
     format = [Rd, Rs, Rt]
-    funct = 0b000010
+    funct = 0b100010
 
 
 class And(RType):
