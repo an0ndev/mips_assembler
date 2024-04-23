@@ -101,6 +101,8 @@ class Offset(Field):
     def parse(cls, text: str):
         imm_part, sep, reg_part = text.rpartition("(")
         reg_part = reg_part[:-1]  # remove ")"
+        if len(imm_part) == 0:
+            imm_part = "0"
         return {cls.register_field_name: _reg_spec_to_number(reg_part), **Imm.parse(imm_part)}
 
 
@@ -195,7 +197,7 @@ class Xori(IType):
 class Sw(IType):
     name = "sw"
     format = [Rt, OffsetRs]
-    opcode = 0b101001
+    opcode = 0b101011
 
 
 class Lw(IType):
@@ -269,13 +271,15 @@ instruction_types = [Addi, Andi, Ori, Xori, Sw, Lw, Multu, Sll, Sra, Srl, Add, S
 nop_machine_code = b"\x00\x00\x00\x00"
 
 
-def assemble(source_lines: list[str], **settings) -> bytes:
+def assemble(source_lines: list[str], **settings) -> tuple[list[tuple[bytes, Optional[str]]], str]:
     settings.setdefault("add_nops", False)
 
-    all_code = b""
+    instructions = []
+
     for line in source_lines:
         instr, comment = assemble_line(line)
-        all_code += instr
+        if len(instr) > 0:
+            instructions.append((instr, line))
 
         if comment is not None and comment.startswith("pragma"):
             directive = comment.partition(" ")[2]
@@ -287,21 +291,21 @@ def assemble(source_lines: list[str], **settings) -> bytes:
                 assert False, f"unknown assembler directive {directive}"
 
     if settings["add_nops"]:
-        code_with_nops = b""
-        for instr_idx in range(len(all_code) // 4):
-            instr = all_code[instr_idx * 4:(instr_idx + 1) * 4]
-            code_with_nops += instr
+        instrs_with_nops = []
+        for instr, line in instructions:
+            instrs_with_nops.append((instr, line))
             if instr != nop_machine_code:
-                code_with_nops += nop_machine_code * 4
+                for _ in range(4):
+                    instrs_with_nops.append((nop_machine_code, None))
 
-        all_code = code_with_nops
+        instructions = instrs_with_nops
 
     if settings["as_vhdl"]:
-        code_text = machine_code_to_vhdl(all_code)
+        code_text = machine_code_to_vhdl(instructions)
     else:
-        code_text = machine_code_to_text(all_code)
+        code_text = machine_code_to_text(instructions)
 
-    return all_code, code_text
+    return instructions, code_text
 
 
 def assemble_line(line: str) -> (bytes, Optional[str]):
@@ -354,12 +358,10 @@ def assemble_line(line: str) -> (bytes, Optional[str]):
     return encoded_instr, comment
 
 
-def machine_code_to_vhdl(machine_code: bytes) -> str:
-    num_bytes = len(machine_code)
+def machine_code_to_vhdl(machine_code: list[tuple[bytes, Optional[str]]]) -> str:
     text = ""
 
-    for instr_idx in range(len(machine_code) // 4):
-        instr = machine_code[instr_idx * 4:(instr_idx + 1) * 4]
+    for instr, src_line in machine_code:
         instr_hex = instr.hex()
 
         text += "    " * 2
@@ -370,6 +372,9 @@ def machine_code_to_vhdl(machine_code: bytes) -> str:
             if start_idx < 3:
                 text += " "
 
+        if src_line is not None:
+            text += " -- " + src_line.strip()
+
         text += "\n"
 
     text = text[:-1]  # remove trailing newline
@@ -377,17 +382,17 @@ def machine_code_to_vhdl(machine_code: bytes) -> str:
     return text
 
 
-def machine_code_to_text(machine_code: bytes) -> str:
+def machine_code_to_text(machine_code: list[tuple[bytes, Optional[str]]]) -> str:
     lines = []
 
-    for instr_idx in range(len(machine_code) // 4):
-        instr = machine_code[instr_idx * 4:(instr_idx + 1) * 4]
+    for instr, src_line in machine_code:
         lines.append(instr.hex())
 
     return "\n".join(lines)
 
 
 # UI
+
 import tkinter
 import tkinter.messagebox
 import traceback
