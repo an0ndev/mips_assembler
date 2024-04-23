@@ -413,6 +413,10 @@ def run_ui():
         machine_code_box.delete("1.0", "end")
         machine_code_box.insert("1.0", code_text)
 
+    def paste_input():
+        assembly_box.delete("1.0", "end")
+        assembly_box.insert("1.0", root.clipboard_get())
+
     def copy_output():
         root.clipboard_clear()
         root.clipboard_append(machine_code_box.get("1.0", "end"))
@@ -441,14 +445,20 @@ def run_ui():
     machine_code_box_scrollbar.grid(row=2, column=4, sticky="NS")
     machine_code_box["yscrollcommand"] = machine_code_box_scrollbar.set
 
+    paste_button = tkinter.Button(root, text="Paste", command=paste_input)
+    paste_button.grid(row=3, column=0, columnspan=2)
     copy_button = tkinter.Button(root, text="Copy", command=copy_output)
     copy_button.grid(row=3, column=3, columnspan=2)
 
     def show_about_text():
-        tkinter.messagebox.showinfo("About", "line 1\nline 2")
+        message = """Written by Eric Reed for CMPE-260
+Help by Orion Holt, Manuel Waisbord
+Contribute at: https://github.com/an0ndev/mips_assembler
+Happy assembling! :)"""
+        tkinter.messagebox.showinfo("About", message)
 
     about_button = tkinter.Button(root, text="About", command=show_about_text)
-    about_button.grid(row=0, columnspan=5, sticky="E")
+    about_button.grid(row=3, column=2)
 
     root.mainloop()
 
