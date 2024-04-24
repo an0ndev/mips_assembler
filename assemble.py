@@ -393,12 +393,11 @@ def machine_code_to_text(machine_code: list[tuple[bytes, Optional[str]]]) -> str
 
 # UI
 
-import tkinter
-import tkinter.messagebox
-import traceback
-
-
 def run_ui():
+    import tkinter
+    import tkinter.messagebox
+    import traceback
+
     root = tkinter.Tk()
     root.title("MIPS Assembler, by Eric Reed (ejr9567@g.rit.edu)")
 
