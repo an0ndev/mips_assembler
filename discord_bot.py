@@ -4,6 +4,7 @@ from assemble import assemble
 import pathlib
 import json
 import traceback
+import io
 
 import discord
 
@@ -34,13 +35,25 @@ async def on_message(message):
 
     try:
         _, code_text = assemble(src, add_nops="add_nops" in options, as_vhdl="as_vhdl" in options)
-        code_text = f"```\n{code_text}\n```"
+        code_text_with_tags = f"```\n{code_text}\n```"
+        as_attachment = len(code_text_with_tags) > 2000
+        if not as_attachment:
+            code_text = code_text_with_tags
     except AssertionError as assertion_error:
         code_text = "Syntax error: " + str(assertion_error)
+        as_attachment = False
     except Exception:
         code_text = "Unexpected error:\n" + "```\n" + traceback.format_exc() + "```"
+        as_attachment = False
 
-    await message.reply(code_text)
+    if as_attachment:
+        args = ("",)
+        kwargs = {"file": discord.File(io.BytesIO(code_text.encode()), filename="code.txt")}
+    else:
+        args = (code_text,)
+        kwargs = {}
+
+    await message.reply(*args, **kwargs)
 
 
 client.run(token)
