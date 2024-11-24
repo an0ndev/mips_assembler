@@ -43,3 +43,6 @@ Binary immediates are also supported; prepend the value with `0b` or `2_`.
 
 ## Bugs
 Report to Eric on Discord (@ericmakesbeats), via email (`eric (at) an0n (dot) dev`), or via the issue tracker on GitHub. I will respond fastest to Discord or email. Thanks!
+
+## License
+MIT. In short, please feel free to use any code from the project in any way without attribution or explicit permission from me.
