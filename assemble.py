@@ -368,7 +368,7 @@ def machine_code_to_vhdl(machine_code: list[tuple[bytes, Optional[str]]]) -> str
 
         for start_idx in range(4):
             byte = instr_hex[start_idx * 2:(start_idx + 1) * 2]
-            text += f"8ux\"{byte}\","
+            text += f"x\"{byte}\","
             if start_idx < 3:
                 text += " "
 
