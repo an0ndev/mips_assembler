@@ -65,7 +65,6 @@ For help or improvements, contact Eric. Thanks!
 
 @client.event
 async def on_message(message: discord.Message):
-    print(f"message {message}")
     if message.author == client.user:
         return
 
@@ -74,6 +73,7 @@ async def on_message(message: discord.Message):
             await message.reply(*args, **kwargs)
 
     msg: str = message.content
+    print(f"From {message.author.name}:\n{message}\n")
 
     if msg.startswith("!help"):
         await reply_if_dm(usage_msg)
