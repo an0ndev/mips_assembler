@@ -74,7 +74,7 @@ async def on_message(message: discord.Message):
 
     msg: str = message.content
     if message.channel.type == discord.ChannelType.private:
-        print(f"{'-' * 50}\nDM from {message.author.name}:\n{msg}{'-' * 50}\n\n")
+        print(f"{'-' * 50}\nDM from {message.author.name}:\n{msg}\n{'-' * 50}\n\n")
 
     if msg.startswith("!help"):
         await reply_if_dm(usage_msg)
