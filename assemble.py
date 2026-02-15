@@ -273,11 +273,16 @@ nop_machine_code = b"\x00\x00\x00\x00"
 
 def assemble(source_lines: list[str], **settings) -> tuple[list[tuple[bytes, Optional[str]]], str]:
     settings.setdefault("add_nops", False)
+    settings.setdefault("as_vhdl", False)
+    settings.setdefault("byte_addressed", False)
 
     instructions = []
 
     for line in source_lines:
-        instr, comment = assemble_line(line)
+        try:
+            instr, comment = assemble_line(line)
+        except AssertionError as assertion_error:
+            raise AssertionError(str(assertion_error) + f" (offending instruction: {line})")
         if len(instr) > 0:
             instructions.append((instr, line))
 
@@ -301,7 +306,7 @@ def assemble(source_lines: list[str], **settings) -> tuple[list[tuple[bytes, Opt
         instructions = instrs_with_nops
 
     if settings["as_vhdl"]:
-        code_text = machine_code_to_vhdl(instructions)
+        code_text = machine_code_to_vhdl(instructions, byte_addressed=settings["byte_addressed"])
     else:
         code_text = machine_code_to_text(instructions)
 
@@ -358,7 +363,7 @@ def assemble_line(line: str) -> (bytes, Optional[str]):
     return encoded_instr, comment
 
 
-def machine_code_to_vhdl(machine_code: list[tuple[bytes, Optional[str]]]) -> str:
+def machine_code_to_vhdl(machine_code: list[tuple[bytes, Optional[str]]], byte_addressed: bool) -> str:
     text = ""
 
     for instr, src_line in machine_code:
@@ -366,11 +371,14 @@ def machine_code_to_vhdl(machine_code: list[tuple[bytes, Optional[str]]]) -> str
 
         text += "    " * 2
 
-        for start_idx in range(4):
-            byte = instr_hex[start_idx * 2:(start_idx + 1) * 2]
-            text += f"x\"{byte}\","
-            if start_idx < 3:
-                text += " "
+        if byte_addressed:
+            for start_idx in range(4):
+                byte = instr_hex[start_idx * 2:(start_idx + 1) * 2]
+                text += f"x\"{byte}\","
+                if start_idx < 3:
+                    text += " "
+        else:
+            text += f"x\"{instr_hex}\","
 
         if src_line is not None:
             text += " -- " + src_line.strip()
