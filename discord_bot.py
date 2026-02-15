@@ -121,7 +121,7 @@ async def on_message(message: discord.Message):
         if not as_attachment:
             code_text = code_text_with_tags
     except AssertionError as assertion_error:
-        code_text = "Syntax error :( :" + str(assertion_error)
+        code_text = "Syntax error :( " + str(assertion_error)
         as_attachment = False
     except Exception:
         code_text = "Unexpected error :'(\n" + "```\n" + traceback.format_exc() + "```"
