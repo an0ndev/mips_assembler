@@ -80,12 +80,12 @@ async def on_message(message: discord.Message):
         return
 
     if not msg.startswith("!asm"):
-        await reply_if_dm("bad command, type !help for help")
+        await reply_if_dm("bad command :( type !help for help")
         return
 
     lines = msg.split("\n")
     if len(lines) < 2:
-        await reply_if_dm("need the command line and several lines of code, type !help for help")
+        await reply_if_dm("need the command line and several lines of code :( type !help for help")
         return
 
     command_line = lines[0]
@@ -103,7 +103,7 @@ async def on_message(message: discord.Message):
     # await reply_if_dm(f"`command: {command_name}, options: {options}`")
 
     if command_name != "!asm":
-        await reply_if_dm(f"unexpected command {command_name}, only supports !asm. type !help for help")
+        await reply_if_dm(f"unexpected command {command_name} :( only supports !asm. type !help for help")
         return
 
     src = lines[1:]
@@ -121,10 +121,10 @@ async def on_message(message: discord.Message):
         if not as_attachment:
             code_text = code_text_with_tags
     except AssertionError as assertion_error:
-        code_text = "Syntax error: " + str(assertion_error)
+        code_text = "Syntax error :( :" + str(assertion_error)
         as_attachment = False
     except Exception:
-        code_text = "Unexpected error:\n" + "```\n" + traceback.format_exc() + "```"
+        code_text = "Unexpected error :'(\n" + "```\n" + traceback.format_exc() + "```"
         as_attachment = False
 
     if as_attachment:
