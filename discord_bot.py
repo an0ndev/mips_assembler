@@ -73,7 +73,8 @@ async def on_message(message: discord.Message):
             await message.reply(*args, **kwargs)
 
     msg: str = message.content
-    print(f"From {message.author.name}:\n{message}\n")
+    if message.channel.type == discord.ChannelType.private:
+        print(f"DM from {message.author.name}:\n{msg}\n")
 
     if msg.startswith("!help"):
         await reply_if_dm(usage_msg)
